@@ -14,6 +14,8 @@ import { AutoCompleteNew } from "./AutoCompleteNew";
 import { ImageGallery } from "./ImageGallery";
 import AutoCompleteComponent from "./AutoCompleteComponent";
 import Palindrome from "./Palindrome";
+import QuestionA from "./QuestionA";
+import QuestionB from "./QuestionB";
 export default class App extends React.Component {
   constructor() {
     super();
@@ -57,6 +59,10 @@ export default class App extends React.Component {
           <AutoCompleteComponent />
         ) : this.state.appToBeDisplayed === 13 ? (
           <Palindrome />
+        ) : this.state.appToBeDisplayed === 14 ? (
+          <QuestionA />
+        ) : this.state.appToBeDisplayed === 15 ? (
+          <QuestionB />
         ) : (
           <Meme />
         )}
@@ -69,12 +75,14 @@ export default class App extends React.Component {
         <button onClick={() => this.handleClick(7)}>slides</button>
         <button onClick={() => this.handleClick(9)}>article</button>
         <button onClick={() => this.handleClick(10)}>AutoComplete</button>
+
         <button onClick={() => this.handleClick(12)}>
           AutoCompleteComponent
         </button>
         <button onClick={() => this.handleClick(13)}>Palindrome</button>
         <button onClick={() => this.handleClick(11)}>ImageGallery</button>
-
+        <button onClick={() => this.handleClick(14)}>QuestionA</button>
+        <button onClick={() => this.handleClick(15)}>QuestionB</button>
         <button onClick={() => this.handleClick(8)}>Meme Generator</button>
       </>
     );
