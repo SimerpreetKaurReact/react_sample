@@ -1,44 +1,43 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import cx from "classnames";
 import { Component } from "react";
 
 export default class TodoList extends Component {
   state = {
     todos: [
-      { isDone: false, text: "test" },
-      { isDone: false, text: "test2" },
+      { isDone: false, Input: "clean house" },
+      { isDone: false, Input: "do the dishes" },
     ],
-    todoText: "",
+    todoInput: "",
   };
 
   handleOnChange = (e) => {
     this.setState({
-      todoText: e.target.value,
+      todoInput: e.target.value,
     });
   };
 
   handleSubmit = (e) => {
-    if (Boolean(this.state.todoText) === false) return false;
+    if (Boolean(this.state.todoInput) === false) return false;
 
     this.setState((state) => {
       let newTodos = state.todos.concat({
         isDone: false,
-        text: state.todoText,
+        Input: state.todoInput,
       });
       return {
         todos: newTodos,
-        todoText: "",
+        todoInput: "",
       };
     });
     e.preventDefault();
   };
 
-  manageTodo = (itemIndex) => {
+  showToDOCompleted = (itemIndex) => {
     this.setState((state) => {
-      let newTodos = state.todos.map((todo, index) => {
+      const newTodos = state.todos.map((todo, index) => {
         if (index === itemIndex) {
-          return { isDone: !todo.isDone, text: todo.text };
+          return { isDone: !todo.isDone, Input: todo.Input };
         }
         return todo;
       });
@@ -52,27 +51,53 @@ export default class TodoList extends Component {
     return (
       <>
         <div>
-          <Title>Todo List</Title>
+          <h2>Todo List</h2>
+
           <form onSubmit={this.handleSubmit}>
-            <InputField
-              value={this.state.todoText}
-              handleOnChange={this.handleOnChange}
+            <input
+              type="Input"
+              value={this.state.todoInput}
+              onChange={this.handleOnChange}
             />
             <Button>Add Todo</Button>
           </form>
           <TrackProgress todos={this.state.todos} />
-          <DisplayList todos={this.state.todos} manage={this.manageTodo} />
+          <ul>
+            {this.state.todos.map((element, index) => (
+              <li
+                key={index}
+                onClick={() => this.showToDOCompleted(index)}
+                className={element.isDone ? "is-done" : "is-not-done"}
+              >
+                {element.Input}
+              </li>
+            ))}
+          </ul>
         </div>
         <style>{`
                     .is-done {
-                        text-decoration: line-through;
+                        Input-decoration: line-through;
                     }
                 `}</style>
       </>
     );
   }
 }
+const handleSubmit = (e) => {
+  e.preventDefault();
+  if (Boolean(this.state.todoInput) === false) return false;
 
+  this.setState((state) => {
+    let newTodos = state.todos.concat({
+      isDone: false,
+      Input: state.todoInput,
+    });
+    return {
+      todos: newTodos,
+      todoInput: "",
+    };
+  });
+};
 const Title = ({ children }) => <h2>{children}</h2>;
 const Button = ({ children }) => (
   <button type="submit" value="Submit">
@@ -81,7 +106,7 @@ const Button = ({ children }) => (
 );
 
 const InputField = ({ value, handleOnChange }) => {
-  return <input type="text" value={value} onChange={handleOnChange} />;
+  return <input type="Input" value={value} onChange={handleOnChange} />;
 };
 
 const TrackProgress = ({ todos }) => {
@@ -102,12 +127,9 @@ const DisplayList = ({ todos, manage }) => {
           onClick={() => manage(index)}
           className={element.isDone ? "is-done" : "is-not-done"}
         >
-          {element.text}
+          {element.Input}
         </li>
       ))}
     </ul>
   );
 };
-
-const rootElement = document.getElementById("root");
-ReactDOM.render(<TodoList />, rootElement);

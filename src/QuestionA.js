@@ -5,90 +5,86 @@ export default class QuestionA extends React.Component {
   constructor() {
     super();
     this.state = {
-      firstName: "",
-      lastName: "",
-      isFriendly: true,
-      gender: "male",
-      favColor: "blue",
+      todo: "",
+      todolist: [{ done: false, todo: "something" }],
     };
   }
-
-  handleChange = (event) => {
-    const { name, value, checked, type } = event.target;
-    type === "checkbox"
-      ? this.setState({
-          [name]: checked,
-        })
-      : this.setState({
-          [name]: value,
-        });
+  showToDOCompleted = (itemIndex) => {
+    this.setState((state) => {
+      const newTodos = state.todos.map((todo, index) => {
+        if (index === itemIndex) {
+          return { isDone: !todo.isDone, Input: todo.Input };
+        }
+        return todo;
+      });
+      return {
+        todos: newTodos,
+      };
+    });
   };
+
+  handleClick = (index) => {
+    this.setState((prevState) => {
+      const newTodos = prevState.todolist.map((ele, i) => {
+        if (index === i) {
+          return { done: !ele.done, todo: ele.todo };
+        }
+        return ele;
+      });
+      return { todolist: newTodos };
+    });
+  };
+  submitTodo = (e) => {
+    e.preventDefault();
+    if (Boolean(this.state.todo) === false) return false;
+
+    this.setState((prevState) => ({
+      todo: "",
+      todolist: [...prevState.todolist, { done: false, todo: prevState.todo }],
+    }));
+    console.log(this.state);
+  };
+  handleChange = (e) => {
+    const { name, value } = e.target;
+    this.setState((prevState) => ({ ...prevState, [name]: value }));
+    console.log(this.state.todo);
+  };
+
   render() {
     return (
-      <form className="form" onSubmit={this.handleSubmit}>
+      <div>
+        <p>TO DO LIST</p>
         <input
-          type="text"
-          name="firstName"
-          value={this.state.firstName}
-          placeholder="first name"
-          onChange={(e) => this.handleChange(e)}
-        />
-        <input
-          type="text"
-          name="lastName"
-          value={this.state.lastName}
-          placeholder="last name"
+          type="Input"
+          name="todo"
+          placeholder="Enter new todo"
+          value={this.state.todo}
           onChange={this.handleChange}
         />
-        <p>{`${this.state.firstName}  ${this.state.lastName}`}</p>
-        <textarea
-          type="text"
-          value={this.state.textarea}
-          placeholder="write Something about yourself"
-          onChange={this.handleChange}
-        />
-        <label>
-          <input
-            type="checkbox"
-            checked={this.state.isFriendly}
-            name="isFriendly"
-            onChange={this.handleChange}
-          />
-        </label>
-        <input
-          type="radio"
-          checked={this.state.gender === "male"}
-          name="gender"
-          value="male"
-          onChange={this.handleChange}
-        />
-        Male
-        <input
-          type="radio"
-          checked={this.state.gender === "female"}
-          name="gender"
-          value="female"
-          onChange={this.handleChange}
-        />
-        Female
-        <select
-          value={this.state.favColor}
-          onChange={this.handleChange}
-          name="favColor"
-        >
-          <option value="blue">Blue</option>
-          <option value="green">Green</option>
-          <option value="red">Red</option>
-          <option value="orange">Orange</option>
-          <option value="yellow">Yellow</option>
-        </select>
-        <h1>
-          {this.state.firstName} {this.state.lastName}
-        </h1>
-        <h2>You are a {this.state.gender}</h2>
-        <h2>Your favorite color is {this.state.favColor}</h2>
-        <button>Submit</button>
-      </form>
+        <button onClick={this.submitTodo}>Add todo</button>
+        <ul>
+          {this.state.todolist?.length ? (
+            this.state.todolist?.map((ele, index) => (
+              <li onClick={() => this.handleClick(index)} key={index}>
+                {ele.todo}
+              </li>
+            ))
+          ) : (
+            <></>
+          )}
+        </ul>
+        <TrackProgress todos={this.state.todolist} />
+      </div>
     );
   }
 }
+const TrackProgress = ({ todos }) => {
+  console.log(todos);
+  const filterTodos = todos?.filter((ele) => ele.done === true);
+
+  return (
+    <p>
+      {filterTodos?.length} completed out of {todos?.length}
+    </p>
+  );
+};

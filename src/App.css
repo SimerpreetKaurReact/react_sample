@@ -159,3 +159,13 @@ header > p {
 .flag-container {
   display: flex;
 }
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 15px 20px;
+}
+.button-item {
+  width: max-content;
+  height: 80px;
+}

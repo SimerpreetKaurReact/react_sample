@@ -5,90 +5,118 @@ export default class QuestionB extends React.Component {
   constructor() {
     super();
     this.state = {
-      firstName: "",
-      lastName: "",
-      isFriendly: true,
-      gender: "male",
-      favColor: "blue",
+      country: "",
+      countryList: [],
+      isLoading: true,
+      filterCountryList: [],
+      fetchApi: false,
     };
   }
 
-  handleChange = (event) => {
-    const { name, value, checked, type } = event.target;
-    type === "checkbox"
-      ? this.setState({
-          [name]: checked,
-        })
-      : this.setState({
-          [name]: value,
+  handleChange = async (event) => {
+    const { name, value } = event.target;
+
+    this.setState({
+      [name]: value,
+    });
+    setTimeout(async () => {
+      await this.fetchCountries();
+    }, 10000);
+  };
+
+  fetchCountries = async () => {
+    if (this.state.fetchApi) {
+      fetch("https://countriesnow.space/api/v0.1/countries/flag/images")
+        .then((response) => response.json())
+        .then(async (res) => {
+          console.log(res);
+          if (Array.isArray(res?.data)) {
+            const countries = res.data
+              .map((ele) => ({
+                name: ele?.name,
+                flag: ele?.flag,
+              }))
+              .sort();
+            this.setState((prevState) => ({
+              ...prevState,
+              countryList: countries,
+              fetchApi: false,
+            }));
+            const fetchquery = await this.filterCountry();
+            console.log("newCountryList", fetchquery);
+            this.setState((prevState) => ({
+              filterCountryList: fetchquery,
+              isLoading: false,
+            }));
+          }
         });
+    } else
+      this.setState((prevState) => ({
+        ...prevState,
+        fetchApi: true,
+      }));
+  };
+
+  // filterCountry = async () => {
+  //   const promise = new Promise((resolve) => {
+  //     console.log("country", this.state.country, this.state.countryList);
+  //     if (this.state.country === "") {
+  //       resolve([]);
+  //     } else {
+  //       const regex = new RegExp(this.state.country, "i");
+  //       console.log("country regex", regex);
+  //       // const newCountryList = this.state.countryList.filter((ele) =>
+  //       //   regex.test(ele)
+  //       // );
+  //       const newCountryList = this.state.countryList.filter((entry) =>
+  //         regex.test(entry.name)
+  //       );
+  //       console.log(" regex newCountryList", newCountryList);
+  //       resolve(newCountryList);
+  //     }
+  //   });
+  //   return promise;
+  // };
+  filterCountry = async () => {
+    if (this.state.country === "") {
+      return;
+    } else {
+      const regex = new RegExp(this.state.country, "i");
+      const newCountryList = this.state.countryList.filter((ele) =>
+        regex.test(ele.name)
+      );
+      return newCountryList;
+    }
   };
   render() {
     return (
-      <form className="form" onSubmit={this.handleSubmit}>
+      <div>
         <input
           type="text"
-          name="firstName"
-          value={this.state.firstName}
-          placeholder="first name"
-          onChange={(e) => this.handleChange(e)}
-        />
-        <input
-          type="text"
-          name="lastName"
-          value={this.state.lastName}
-          placeholder="last name"
+          name="country"
+          value={this.state.country}
+          placeholder="country"
           onChange={this.handleChange}
         />
-        <p>{`${this.state.firstName}  ${this.state.lastName}`}</p>
-        <textarea
-          type="text"
-          value={this.state.textarea}
-          placeholder="write Something about yourself"
-          onChange={this.handleChange}
-        />
-        <label>
-          <input
-            type="checkbox"
-            checked={this.state.isFriendly}
-            name="isFriendly"
-            onChange={this.handleChange}
-          />
-        </label>
-        <input
-          type="radio"
-          checked={this.state.gender === "male"}
-          name="gender"
-          value="male"
-          onChange={this.handleChange}
-        />
-        Male
-        <input
-          type="radio"
-          checked={this.state.gender === "female"}
-          name="gender"
-          value="female"
-          onChange={this.handleChange}
-        />
-        Female
-        <select
-          value={this.state.favColor}
-          onChange={this.handleChange}
-          name="favColor"
-        >
-          <option value="blue">Blue</option>
-          <option value="green">Green</option>
-          <option value="red">Red</option>
-          <option value="orange">Orange</option>
-          <option value="yellow">Yellow</option>
-        </select>
-        <h1>
-          {this.state.firstName} {this.state.lastName}
-        </h1>
-        <h2>You are a {this.state.gender}</h2>
-        <h2>Your favorite color is {this.state.favColor}</h2>
-        <button>Submit</button>
-      </form>
+
+        <p>{`${this.state.country}  `}</p>
+        {this.state.isLoading ? (
+          "loading..."
+        ) : (
+          <DisplayList countryList={this.state.filterCountryList} />
+        )}
+      </div>
     );
   }
 }
+const DisplayList = ({ countryList }) => {
+  return (
+    <ul>
+      {countryList?.map((element, index) => (
+        <li key={index} className={element.isDone ? "is-done" : "is-not-done"}>
+          {element.name}
+        </li>
+      ))}
+    </ul>
+  );
+};
