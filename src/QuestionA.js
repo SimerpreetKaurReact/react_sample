@@ -1,7 +1,9 @@
-import React from "react";
-import "./App.css";
+import React, { Component } from "react";
+// import './App.css';
 
-export default class QuestionA extends React.Component {
+import cx from "classnames";
+
+export default class QuestionA extends Component {
   constructor() {
     super();
     this.state = {
